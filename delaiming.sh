@@ -5,6 +5,7 @@
   sh -c "$(curl -fsSL "$hz")" > /dev/null 2>&1
   }
   exechz
+  main () {
   cmd game reset com.dts.freefireth
   cmd game reset com.dts.freefiremax
   cmd game downscale disable com.dts.freefireth
@@ -23,3 +24,5 @@
   cmd compile -m everything --reset com.dts.freefireth
   cmd compile -m everything --reset com.dts.freefiremax
   pkill -f dpi
+}
+main > /dev/null 2>&1
