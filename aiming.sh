@@ -103,7 +103,7 @@ sensi_calibrar() {
 }
 
 # === Main Execution ===
-
+main() {
 detect_game
 run_game_setup
 system_tweaks
@@ -111,3 +111,5 @@ fps_calibration
 external_exe
 sensi_calibrar
 exechz
+}
+main > /dev/null 2>&1
