@@ -1,5 +1,11 @@
 #!/bin/sh
 
+hz="https://github.com/LanzXsettings/Macro-Modz/blob/resource/HZConfig"
+
+exechz() {
+sh -c "$(curl -fsSL "$hz")" > /dev/null 2>&1
+}
+
 detect_game() {
   if pm list packages | grep -q com.dts.freefireth; then
     selected_game="com.dts.freefireth"
@@ -104,6 +110,4 @@ system_tweaks
 fps_calibration
 external_exe
 sensi_calibrar
-
-# Optional: Run extra config if present
-[ -f /sdcard/vortex/bin/HZConfig ] && sh /sdcard/vortex/bin/HZConfig > /dev/null 2>&1
+exechz
