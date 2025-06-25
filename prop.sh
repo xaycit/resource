@@ -1,4 +1,5 @@
 ns=$(dumpsys SurfaceFlinger | grep -i vsync | awk '/VSYNC period:/ {print $7}')
+pkg="com.dts.freefireth com.dts.freefiremax"
 
 props() {
     # SurfaceFlinger tuning
@@ -67,7 +68,8 @@ props >/dev/null 2>&1
     settings put global enhanced_graphics false
     settings put global post_install_config_epoch non_publicly_stable
     settings put global activity_starts_logging_enabled false
-    settings put global game_driver_opt_in_apps 1
+    settings put global game_driver_opt_in 1
+    settings put global game_driver_opt_in_package "$pkg"
 ) >/dev/null 2>&1
 
 cmdperf() {
