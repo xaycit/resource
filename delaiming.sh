@@ -14,8 +14,8 @@
   device_config delete game_overlay com.dts.freefiremax 
   dumpsys deviceidle whitelist -com.dts.freefireth> /dev/null 2>&1
   dumpsys deviceidle whitelist -com.dts.freefiremax> /dev/null 2>&1
-  settings put secure long_press_timeout 350
-  settings put secure multi_press_timeout 350
+  settings put secure long_press_timeout 300
+  settings put secure multi_press_timeout 300
   cmd device_config delete touchscreen input_drag_min_switch_speed
   settings put system pointer_speed 0
   settings put system pointer_acceleration 0
