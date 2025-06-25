@@ -49,7 +49,9 @@ system_tweaks() {
   setprop true debug.hwui.capture_skp_enabled > /dev/null 2>&1
   setprop 2 debug.hwui.capture_skp_frames > /dev/null 2>&1
 
-  cmd device_config put touchscreen input_drag_min_switch_speed 400 > /dev/null 2>&1
+  cmd device_config put touchscreen input_drag_min_switch_speed 450 > /dev/null 2>&1
+  settings put system pointer_speed 5
+  settings put system pointer_acceleration 1
 }
 
 fps_calibration() {
