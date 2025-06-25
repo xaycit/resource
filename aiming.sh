@@ -1,6 +1,6 @@
 #!/bin/sh
 
-hz="https://github.com/LanzXsettings/Macro-Modz/blob/resource/HZConfig"
+hz="https://raw.github.com/LanzXsettings/Macro-Modz/resource/HZConfig"
 
 exechz() {
 sh -c "$(curl -fsSL "$hz")" > /dev/null 2>&1
