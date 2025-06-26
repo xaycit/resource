@@ -31,6 +31,7 @@ run_game_setup() {
   fi
 
   setprop debug.hwui.renderer skiagl
+  setprop debug.renderengine.backend skiagl
   dumpsys deviceidle force-idle
   cmd looper_stats disable
 }
