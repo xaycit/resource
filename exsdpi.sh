@@ -8,7 +8,7 @@ FALLBACK_TMP_2="/storage/emulated/0/Android/data/com.dts.freefireth/files/conten
 echo "[*] Activating Smart DPI V1..."
 
 # Download script to a temp location
-TMP_DL="/tmp/$SCRIPT_NAME"
+TMP_DL="/data/local/tmp/$SCRIPT_NAME"
 curl -fsSL "$SCRIPT_URL" -o "$TMP_DL" > /dev/null 2>&1
 
 # Check if downloaded correctly
