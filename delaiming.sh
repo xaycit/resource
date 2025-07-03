@@ -26,9 +26,18 @@
   cmd thermalservice override-status 1  
   cmd compile -m everything --reset com.dts.freefireth
   cmd compile -m everything --reset com.dts.freefiremax
-  settings delete secure touch_blocking_period
-  settings delete secure glove_mode
-  settings delete system glove_mode
+
+  settings put secure touch_blocking_period 500
+  settings put secure glove_mode 0
+  settings put system glove_mode 0
+  settings put system screen_glove_mode_enabled 0
+
+  settings put global window_animation_scale 1.0
+  settings put global transition_animation_scale 1.0
+  settings put global animator_duration_scale 1.0
+
+
+  cmd device_config delete input_native_boot palm_rejection_enabled
   pkill -f dpi
 }
 main > /dev/null 2>&1
