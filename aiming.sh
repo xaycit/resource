@@ -51,6 +51,15 @@ system_tweaks() {
   setprop 2 debug.hwui.capture_skp_frames > /dev/null 2>&1
 
   cmd device_config put touchscreen input_drag_min_switch_speed 450 > /dev/null 2>&1
+  setprop debug.tracing.block_touch_buffer 1
+  settings put secure touch_blocking_period 0
+  settings put secure glove_mode 1
+  settings put system glove_mode 1
+  settings put system screen_glove_mode_enabled 1
+  settings put global window_animation_scale 0.5
+  settings put global transition_animation_scale 0.5
+  settings put global animator_duration_scale 0.5
+  cmd device_config put input_native_boot palm_rejection_enabled 0
   settings put system pointer_speed 5
   settings put system pointer_acceleration 1
 }
@@ -86,23 +95,32 @@ external_exe() {
 aim_tracking_opt() {
   val="$1"
   [ "$val" -lt 0 ] && val=0
-  [ "$val" -gt 1000 ] && val=1000
+  [ "$val" -gt 10000 ] && val=10000
   echo "$val"
 }
 
-sensi_calibrar() {
-  x=$(expr $RANDOM % 1000 + 1)
-  y=$(expr $RANDOM % 1000 + 1)
-  duration=$(expr $RANDOM % 1000 + 500)
-  x_opt=$(aim_tracking_opt "$x")
-  y_opt=$(aim_tracking_opt "$y")
+get_screen() {
+  wm size | grep -oP '[0-9]+x[0-9]+'
+}
 
-  eval "input swipe $x_opt $y_opt 2000 2000 $duration -1"
-  eval "input swipe $x_opt $y_opt 2000 0 $duration -1"
-  eval "input swipe $x_opt $y_opt 0 2000 $duration -1"
-  eval "input swipe $x_opt $y_opt 0 0 $duration -1"
-  eval "input swipe $x_opt $y_opt 2000 2000 $duration -1"
-  eval "input swipe $x_opt $y_opt 0 2000 $duration -1"
+sensi_calibrar() {
+  screen_size=$(get_screen)
+  screen_width=$(echo "$screen_size" | cut -d'x' -f1)
+  screen_height=$(echo "$screen_size" | cut -d'x' -f2)
+
+  x=$(expr $screen_width / 2)
+  y_mid=$(expr $screen_height / 2)
+  y_top=100
+  y_bottom=$(expr $screen_height - 100)
+  duration=$(expr $RANDOM % 1000 + 500)
+
+  x_opt=$(aim_tracking_opt "$x")
+  y_mid_opt=$(aim_tracking_opt "$y_mid")
+  y_top_opt=$(aim_tracking_opt "$y_top")
+  y_bottom_opt=$(aim_tracking_opt "$y_bottom")
+
+  eval "input swipe $x_opt $y_mid_opt $x_opt $y_top_opt $duration -1"
+  eval "input swipe $x_opt $y_top_opt $x_opt $y_bottom_opt $duration -1"
 }
 
 # === Main Execution ===
