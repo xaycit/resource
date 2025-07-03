@@ -5,6 +5,8 @@ rmvv() {
     dumpsys deviceidle enable
     dumpsys deviceidle step deep
     dumpsys deviceidle force-idle
+
+    
     } >/dev/null 2>&1
 
     # Clean performance & boost settings
@@ -33,23 +35,23 @@ rmvv() {
     # Net settings cleanup
     {
         settings delete global net.dns1
-        settings delete global net.dns2
-        settings delete global net.tcp.buffersize.default
-        settings delete global net.tcp.buffersize.wifi
-        settings delete global net.tcp.buffersize.umts
-        settings delete global wifi_sleep_policy
-        settings delete global private_dns_specifier
-        settings delete global wifi_score_params
-        settings delete global wifi_coverage_extend_feature_enabled
-        settings delete global wifi_networks_available_notification_on
-        settings delete global wifi_poor_connection_warning
-        settings delete global wifi_scan_always_enabled
-        settings delete global wifi_scan_throttle_enabled
-        settings delete global wifi_verbose_logging_enabled
-        settings delete global wifi_suspend_optimizations_enabled
-        settings delete global wifi_wakeup_enabled
-        settings delete global sysui_powerui_enabled
-        settings delete global ble_scan_always_enabled
+settings delete global net.dns2
+settings delete global net.tcp.buffersize.default
+settings delete global net.tcp.buffersize.wifi
+settings delete global net.tcp.buffersize.umts
+settings delete global wifi_sleep_policy
+settings delete global private_dns_specifier
+settings delete global wifi_score_params
+settings delete global wifi_coverage_extend_feature_enabled
+settings delete global wifi_networks_available_notification_on
+settings delete global wifi_poor_connection_warning
+settings delete global wifi_scan_always_enabled
+settings delete global wifi_scan_throttle_enabled
+settings delete global wifi_verbose_logging_enabled
+settings delete global wifi_suspend_optimizations_enabled
+settings delete global wifi_wakeup_enabled
+settings delete global sysui_powerui_enabled
+settings delete global ble_scan_always_enabled
     } >/dev/null 2>&1
 
 {
@@ -70,6 +72,7 @@ for app in com.google.android.gms com.google.android.ims; do
 done
 
 # Disable High-Performance Mode
+settings put global GPUTUNER_SWITCH false
 settings put system high_performance_mode_on 0
 settings put system power_save_type_performance 0
 
