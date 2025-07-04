@@ -36,6 +36,9 @@ props() {
     setprop debug.sf.client_target_offset_ns $ns
     setprop debug.sf.display_freeze_budget_ns $ns
     setprop debug.sf.rendering_freeze.budget_ns $ns
+    setprop debug.sf.showfps 0
+    setprop debug.sf.showcpu 0
+    setprop debug.hwui.fps_divisor 0
 }
 props >/dev/null 2>&1
 
@@ -96,6 +99,7 @@ devopt() {
 cmd power set-adaptive-power-saver-enabled false
 cmd power set-fixed-performance-mode-enabled true
 cmd power set-mode 0
+settings put global GPUTUNER_SWITCH true
 
 # Override Thermal Status
 cmd thermalservice override-status 0
