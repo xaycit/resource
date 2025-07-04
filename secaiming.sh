@@ -37,6 +37,12 @@ system_tweaks() {
   cmd device_config put touchscreen input_drag_min_switch_speed 380 > /dev/null 2>&1
   settings put system pointer_speed 2
   settings put system pointer_acceleration 1
+  settings put global window_animation_scale 0.5
+  settings put global transition_animation_scale 0.5
+  settings put global animator_duration_scale 0.5
+  setprop debug.tracing.block_touch_buffer 1
+  settings put system screen_glove_mode_enabled 1
+  settings put secure touch_blocking_period 0
 }
 
 fps_calibration() {
