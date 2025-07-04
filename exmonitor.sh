@@ -1,5 +1,5 @@
 SCRIPT_NAME="monitor.sh"
-SCRIPT_URL="https://raw.githubusercontent.com/xaycit/resource/main/sdpi.sh"
+SCRIPT_URL="https://raw.githubusercontent.com/xaycit/resource/main/monitor.sh"
 
 PRIMARY_TMP="/data/local/tmp"
 FALLBACK_TMP_1="/storage/emulated/0/Android/data/com.dts.freefiremax/files/contentcache/Temp/android"
