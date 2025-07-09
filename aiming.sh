@@ -26,7 +26,7 @@ fetchM "$SCRIPT_URL"
 }
 
 detect_game() {
-  if pm list packages | grep -q com.dtsen
+  if pm list packages | grep -q com.dts.freefireth; then
     selected_game="com.dts.freefireth"
   elif pm list packages | grep -q com.dts.freefiremax; then
     selected_game="com.dts.freefiremax"
