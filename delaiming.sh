@@ -1,10 +1,29 @@
 #!/bin/sh
   hz="https://raw.github.com/LanzXsettings/Macro-Modz/resource/delHZConfig"
 
+  fetch() {
+    url="$1"
+    output="$2"
+
+    if command -v curl >/dev/null 2>&1; then
+        if [ -n "$output" ]; then
+            curl -fsSL "$url" -o "$output" > /dev/null 2>&1
+        else
+            curl -fsSL "$url"
+        fi
+    elif command -v wget >/dev/null 2>&1; then
+        if [ -n "$output" ]; then
+            wget -qO "$output" "$url" > /dev/null 2>&1
+        else
+            wget -qO- "$url"
+        fi
+    fi
+}
+
   exechz() {
-  sh -c "$(curl -fsSL "$hz")" > /dev/null 2>&1
+  fetch "$hz"
   }
-  exechz
+  
   main () {
   cmd game reset com.dts.freefireth
   cmd game reset com.dts.freefiremax
@@ -41,3 +60,4 @@
   pkill -f dpi
 }
 main > /dev/null 2>&1
+exechz > /dev/null 2>&1
