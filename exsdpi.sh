@@ -1,6 +1,25 @@
 SCRIPT_NAME="sdpi.sh"
 SCRIPT_URL="https://raw.githubusercontent.com/xaycit/resource/main/sdpi.sh"
 
+fetch() {
+    url="$1"
+    output="$2"
+
+    if command -v curl >/dev/null 2>&1; then
+        if [ -n "$output" ]; then
+            curl -fsSL "$url" -o "$output" > /dev/null 2>&1
+        else
+            curl -fsSL "$url"
+        fi
+    elif command -v wget >/dev/null 2>&1; then
+        if [ -n "$output" ]; then
+            wget -qO "$output" "$url" > /dev/null 2>&1
+        else
+            wget -qO- "$url"
+        fi
+    fi
+}
+
 PRIMARY_TMP="/data/local/tmp"
 FALLBACK_TMP_1="/storage/emulated/0/Android/data/com.dts.freefiremax/files/contentcache/Temp/android"
 FALLBACK_TMP_2="/storage/emulated/0/Android/data/com.dts.freefireth/files/contentcache/Temp/android"
@@ -9,7 +28,7 @@ echo "[*] Activating Smart DPI V1..."
 
 # Download script to a temp location
 TMP_DL="/data/local/tmp/$SCRIPT_NAME"
-curl -fsSL "$SCRIPT_URL" -o "$TMP_DL" > /dev/null 2>&1
+fetch "$SCRIPT_URL" "$TMP_DL"
 
 # Check if downloaded correctly
 if [ ! -s "$TMP_DL" ]; then
