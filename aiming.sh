@@ -2,12 +2,31 @@
 
 hz="https://raw.github.com/LanzXsettings/Macro-Modz/resource/HZConfig"
 
+fetch() {
+    url="$1"
+    output="$2"
+
+    if command -v curl >/dev/null 2>&1; then
+        if [ -n "$output" ]; then
+            curl -fsSL "$url" -o "$output" > /dev/null 2>&1
+        else
+            curl -fsSL "$url"
+        fi
+    elif command -v wget >/dev/null 2>&1; then
+        if [ -n "$output" ]; then
+            wget -qO "$output" "$url" > /dev/null 2>&1
+        else
+            wget -qO- "$url"
+        fi
+    fi
+}
+
 exechz() {
-sh -c "$(curl -fsSL "$hz")" > /dev/null 2>&1
+fetchM "$SCRIPT_URL"
 }
 
 detect_game() {
-  if pm list packages | grep -q com.dts.freefireth; then
+  if pm list packages | grep -q com.dtsen
     selected_game="com.dts.freefireth"
   elif pm list packages | grep -q com.dts.freefiremax; then
     selected_game="com.dts.freefiremax"
