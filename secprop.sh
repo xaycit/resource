@@ -120,4 +120,4 @@ devopt >/dev/null 2>&1
 
 }
 
-main >dev/null 2>&1
+main >/dev/null 2>&1
