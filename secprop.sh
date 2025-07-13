@@ -1,6 +1,8 @@
 ns=$(dumpsys SurfaceFlinger | grep -i vsync | awk '/VSYNC period:/ {print $7}')
 pkg="com.dts.freefireth com.dts.freefiremax"
 
+main () {
+
 props() {
     # SurfaceFlinger tuning
     setprop debug.sf.early.app.duration 16667
@@ -114,3 +116,7 @@ done
 
 }
 devopt >/dev/null 2>&1
+
+}
+
+main >dev/null 2>&1
