@@ -44,7 +44,7 @@ props() {
 }
 props >/dev/null 2>&1
 
-(
+setput() {
     # Boost-related settings
     settings put global kernel_cpu_thread_reader 5
     settings put global enhanced_cpu_responsiveness 1
@@ -62,7 +62,8 @@ props >/dev/null 2>&1
     settings put global activity_starts_logging_enabled false
     settings put global game_driver_opt_in 1
     settings put global game_driver_opt_in_package "$pkg"
-) >/dev/null 2>&1
+}
+setput >/dev/null 2>&1
 
 cmdperf() {
     cmd looper_stats disable
