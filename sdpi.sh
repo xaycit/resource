@@ -7,8 +7,10 @@ PKG2="com.dts.freefiremax"
 STATE="stopped"
 
 # Detect maximum supported refresh rate (fallback: 120)
-MAX_HZ=$(dumpsys display | grep -Eo 'modeId.*[0-9]+Hz' | grep -Eo '[0-9]+(?=Hz)' | sort -nr | head -n1)
-[ -z "$MAX_HZ" ] && MAX_HZ=120
+fps="$(dumpsys display | grep -Eo 'fps=[0-9]+' | cut -d= -f2 | sort -n | uniq | tail -n1)"
+  [ -z "$fps" ] && fps=120
+
+MAX_HZ="$fps"
 
 DEFAULT_HZ=60
 
