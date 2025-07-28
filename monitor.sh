@@ -44,7 +44,7 @@ while true; do
 
     MSG="CPU:${CPU_USAGE}% Freq:${CUR_HZ}MHz→${ENCH_HZ}MHz RAM:${MEM_USED_MB}MB Proc:${PROC_COUNT}"
 
-    cmd notification post -S bigtext -t "Real-Time Monitoring" monitor "$MSG"
+    cmd notification post -S bigtext -t "Real-Time Monitoring" monitor "$MSG" > /dev/null 2>&1
 
     sleep $INTERVAL
 done
