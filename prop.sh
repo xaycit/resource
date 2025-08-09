@@ -90,6 +90,23 @@ props >/dev/null 2>&1
     settings put global game_driver_opt_in_package "$pkg"
 ) >/dev/null 2>&1
 
+renderboost() {
+#async
+setprop debug.egl.sync 0
+setprop debug.gfx.force_async 1
+setprop debug.mdpcomp.force_async 1 
+setprop debug.hwc.force_async 1
+setprop debug.sf.force_async 1
+setprop debug.force-opengl 1
+setprop debug.hwc.force_gpu_vsync 1
+
+#renderer
+setprop debug.composition.type $(getprop debug.hwui.renderer)
+setprop debug.composition.type2 gpu
+setprop debug.composition.pipeline.type 3
+}
+renderboost > /dev/null 2>&1
+
 cmdperf() {
     cmd looper_stats disable
     cmd shortcut reset-throttling
