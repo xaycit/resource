@@ -2,6 +2,10 @@ ns=$(dumpsys SurfaceFlinger | grep -i vsync | awk '/VSYNC period:/ {print $7}')
 pkg="com.dts.freefireth com.dts.freefiremax"
 
 main () {
+#renderer
+setprop debug.composition.type $(getprop debug.hwui.renderer)
+setprop debug.composition.type2 gpu
+setprop debug.composition.pipeline.type 3
 
 props() {
     # SurfaceFlinger tuning
@@ -61,7 +65,10 @@ setput() {
     settings put global post_install_config_epoch non_publicly_stable
     settings put global activity_starts_logging_enabled false
     settings put global game_driver_opt_in 1
-    settings put global game_driver_opt_in_package "$pkg"
+    setprop debug.performance.tuning 1
+    cmd power set-fixed-performance-mode-enabled true
+    settings put global game_driver_opt_in_package com.dts.freefireth
+    settings put global game_driver_opt_in_package com.dts.freefiremax
 }
 setput >/dev/null 2>&1
 
