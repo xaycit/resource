@@ -87,7 +87,8 @@ props >/dev/null 2>&1
     settings put global post_install_config_epoch non_publicly_stable
     settings put global activity_starts_logging_enabled false
     settings put global game_driver_opt_in 1
-    settings put global game_driver_opt_in_package "$pkg"
+    settings put global game_driver_opt_in_package com.dts.freefireth
+    settings put global game_driver_opt_in_package com.dts.freefiremax
 ) >/dev/null 2>&1
 
 renderboost() {
