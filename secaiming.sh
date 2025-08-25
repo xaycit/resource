@@ -43,6 +43,11 @@ system_tweaks() {
   setprop debug.tracing.block_touch_buffer 1
   settings put system screen_glove_mode_enabled 1
   settings put secure touch_blocking_period 0
+  
+  # Sensivity Booster
+  settings put system touchscreen_sensitivity_mode 3
+  settings put system touchscreen_threshold 8
+  settings put system touchscreen_sensitivity 9
 }
 
 fps_calibration() {
