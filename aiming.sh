@@ -81,6 +81,12 @@ system_tweaks() {
   cmd device_config put input_native_boot palm_rejection_enabled 0
   settings put system pointer_speed 5
   settings put system pointer_acceleration 1
+  
+  # Sensivity Booster
+  settings put system touchscreen_sensitivity_mode 3
+  settings put system touchscreen_threshold 9
+  settings put system touchscreen_sensitivity 10
+  settings put system touchscreen_min_press_time 50
 }
 
 fps_calibration() {
