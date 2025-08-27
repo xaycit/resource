@@ -36,7 +36,7 @@ while true; do
         if [ "$STATE" = "running" ]; then
             cmd notification post -S bigtext -t 'Smart Dpi By Lanzsettings' 'Tag' 'Not Active' > /dev/null 2>&1
 
-            wm density reset
+            wm density 384
 
             # Reset refresh rate
             settings put system peak_refresh_rate "$DEFAULT_HZ"
