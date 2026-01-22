@@ -1,80 +1,105 @@
-ns=$(dumpsys SurfaceFlinger | grep -i vsync | awk '/VSYNC period:/ {print $7}')
-pkg="com.dts.freefireth com.dts.freefiremax"
+#!/bin/sh
 
-props() {
-    # SurfaceFlinger tuning
-    setprop debug.sf.early.app.duration 16667
+# ===== PKG =====
+TH="com.dts.freefireth"
+MAX="com.dts.freefiremax"
+
+# ===== VSYNC =====
+ns=$(dumpsys SurfaceFlinger | awk '/VSYNC period:/ {print $7}')
+[ -z "$ns" ] && ns=16666666
+
+# ===== SF =====
+sf() {
+setprop debug.sf.early.app.duration 16667
 setprop debug.sf.early.sf.duration 16667
 setprop debug.sf.earlyGl.app.duration 16667
 setprop debug.sf.earlyGl.sf.duration 16667
+
 setprop debug.sf.early_app_phase_offset_ns $ns
 setprop debug.sf.early_gl_app_phase_offset_ns $ns
 setprop debug.sf.early_phase_offset_ns $ns
-setprop debug.sf.high_fps.early.app.duration 16667
-setprop debug.sf.high_fps.early.sf.duration 16667
-setprop debug.sf.high_fps.earlyGl.app.duration 16667
-setprop debug.sf.high_fps.hwc.min.duration $ns
-setprop debug.sf.high_fps.late.app.duration 16667
-setprop debug.sf.high_fps.late.sf.duration 16667
+
 setprop debug.sf.high_fps_early_app_phase_offset_ns $ns
-setprop debug.sf.high_fps_early_cpu_app_offset_ns $ns
 setprop debug.sf.high_fps_early_gl_app_phase_offset_ns $ns
-setprop debug.sf.high_fps_early_gpu_app_offset_ns $ns
 setprop debug.sf.high_fps_early_phase_offset_ns $ns
 setprop debug.sf.high_fps_late_app_phase_offset_ns $ns
 setprop debug.sf.high_fps_late_gl_phase_offset_ns $ns
 setprop debug.sf.high_fps_late_phase_offset_ns $ns
 setprop debug.sf.high_fps_late_sf_phase_offset_ns $ns
-setprop debug.sf.phase_offset_threshold_for_next_vsync_ns $ns
-setprop debug.sf.early.display.phase_offset_ns $ns
-setprop debug.sf.early.presentation.phase_offset_ns $ns
-setprop debug.sf.high_fps.sf.max.duration 16667
-setprop debug.sf.high_sf.fps.min.duration 16667
-setprop debug.sf.high_fps.gl_ui.app_phase_offset_ns $ns
-setprop debug.sf.high_fps.gl_ui_app.duration 16667
-setprop debug.sf.max_display_buffer_acquire_time_us $ns
-setprop debug.sf.client_target_offset_ns $ns
-setprop debug.sf.display_freeze_budget_ns $ns
-setprop debug.sf.rendering_freeze.budget_ns $ns
-setprop debug.sf.async_transaction true
-setprop debug.sf.vsync_reactor_ignore_present_fences true
-setprop debug.sf_frame_rate_multiple_fences 999
+
 setprop debug.sf.force_higher_fps 1
-setprop debug.sf.composition.type hwc-gpu
 setprop debug.sf.disable_hw_vsync true
 setprop debug.sf.always_relayout true
-setprop debug.hwui.skia_use_perfetto_track_events false
-setprop debug.hwui.target_cpu_time_percent 25
-setprop debug.hwui.trace_gpu_resources true
-setprop debug.hwui.use_hint_manager true
-setprop debug.hwui.webview_overlays_enabled true
-setprop debug.overlayui.enable 1
-setprop debug.performance.tuning 1
-setprop debug.sf.enable_gl_backpressure 0
-setprop debug.sf.enable_hwc_vds 1
-setprop debug.sf.frame_rate_multiple_threshold 120
-setprop debug.sf.set_touch_timer_ms 100
+setprop debug.sf.composition.type hwc-gpu
 setprop debug.sf.use_phase_offsets_as_durations 1
-setprop debug.hwui.disabledither false
-setprop debug.sf.showupdates 0
-setprop debug.sf.showbackground 0
-setprop debug.sf.showfps 0
-setprop debug.sf.showcpu 0
-
-    # Performance settings
-    settings put global GPUTUNER_SWITCH true
-    settings put system high_performance_mode_on 1
-    settings put system power_save_type_performance 1
-    settings put global low_power_sticky 0
-    settings put global low_power 0
 }
-props >/dev/null 2>&1
+sf >/dev/null 2>&1
 
-(
-    # Boost-related settings
-    settings put global kernel_cpu_thread_reader 5
-    settings put global enhanced_cpu_responsiveness 1
-    settings put global perftune_cpu_enabled 1
+# ===== RENDER =====
+render() {
+setprop debug.egl.sync 0
+setprop debug.gfx.force_async 1
+setprop debug.hwc.force_async 1
+setprop debug.sf.force_async 1
+
+setprop debug.hwui.renderer vulkan
+setprop debug.renderengine.backend vulkan
+}
+render >/dev/null 2>&1
+
+# ===== POWER =====
+power() {
+cmd looper_stats disable
+cmd power set-adaptive-power-saver-enabled false
+cmd power set-fixed-performance-mode-enabled true
+cmd power set-mode 0
+cmd thermalservice override-status 0
+
+settings put system high_performance_mode_on 1
+settings put system power_save_type_performance 1
+settings put global low_power 0
+settings put global low_power_sticky 0
+}
+power >/dev/null 2>&1
+
+# ===== IDLE =====
+idle() {
+dumpsys deviceidle unforce
+dumpsys deviceidle disable
+dumpsys deviceidle whitelist +$TH
+dumpsys deviceidle whitelist +$MAX
+}
+idle >/dev/null 2>&1
+
+# ===== NET =====
+net() {
+settings put global net.dns1 8.8.8.8
+settings put global net.dns2 8.8.4.4
+settings put global private_dns_specifier dns.google
+
+settings put global wifi_sleep_policy 2
+settings put global wifi_scan_always_enabled 0
+settings put global wifi_scan_throttle_enabled 0
+settings put global wifi_verbose_logging_enabled 0
+settings put global wifi_wakeup_enabled 0
+}
+net >/dev/null 2>&1
+
+# ===== GAME =====
+game() {
+# TH
+cmd game set --fps 120 $TH
+cmd package compile -m speed --secondary-dex $TH
+cmd appops set $TH RUN_IN_BACKGROUND
+settings put global game_driver_opt_in_package $TH
+
+# MAX
+cmd game set --fps 120 $MAX
+cmd package compile -m speed --secondary-dex $MAX
+cmd appops set $MAX RUN_IN_BACKGROUND
+settings put global game_driver_opt_in_package $MAX
+}
+game >/dev/null 2>&1    settings put global perftune_cpu_enabled 1
     settings put global perftune_gpu_enabled 1
     settings put global perftune_ram_enabled 1
     settings put global power_mode_refresh_rate 2
