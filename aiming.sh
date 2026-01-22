@@ -1,77 +1,133 @@
 #!/bin/sh
 
-hz="https://raw.github.com/LanzXsettings/Macro-Modz/resource/HZConfig"
+HZ_URL="https://raw.github.com/LanzXsettings/Macro-Modz/resource/HZConfig"
 
+PKG_TH="com.dts.freefireth"
+PKG_MAX="com.dts.freefiremax"
+
+# ================= FETCH ================= #
 fetch() {
     url="$1"
     output="$2"
 
     if command -v curl >/dev/null 2>&1; then
-        if [ -n "$output" ]; then
-            curl -fsSL "$url" -o "$output" > /dev/null 2>&1
-        else
-            curl -fsSL "$url"
-        fi
+        [ -n "$output" ] && curl -fsSL "$url" -o "$output" || curl -fsSL "$url"
     elif command -v wget >/dev/null 2>&1; then
-        if [ -n "$output" ]; then
-            wget -qO "$output" "$url" > /dev/null 2>&1
-        else
-            wget -qO- "$url"
-        fi
+        [ -n "$output" ] && wget -qO "$output" "$url" || wget -qO- "$url"
     fi
 }
 
 exechz() {
-fetchM "$SCRIPT_URL"
+    fetch "$HZ_URL" > /dev/null 2>&1
 }
 
+# ================= GAME DETECTION ================= #
 detect_game() {
-  if pm list packages | grep -q com.dts.freefireth; then
-    selected_game="com.dts.freefireth"
-  elif pm list packages | grep -q com.dts.freefiremax; then
-    selected_game="com.dts.freefiremax"
-  else
-    echo "Game Not Installed"
-    exit 1
-  fi
+    if pm list packages | grep -q "$PKG_TH"; then
+        selected_game="$PKG_TH"
+    elif pm list packages | grep -q "$PKG_MAX"; then
+        selected_game="$PKG_MAX"
+    else
+        exit 1
+    fi
 }
 
+# ================= GAME SETUP ================= #
 run_game_setup() {
-  if [ "$selected_game" = "com.dts.freefireth" ]; then
-    cmd game downscale 1.8 com.dts.freefireth
-    cmd device_config put game_overlay com.dts.freefireth mode=2,downscaleFactor=1.8
-    cmd package compile -m speed --secondary-dex com.dts.freefireth
-    cmd appops set com.dts.freefireth RUN_IN_BACKGROUND
-  elif [ "$selected_game" = "com.dts.freefiremax" ]; then
-    cmd game downscale 1.8 com.dts.freefiremax
-    cmd device_config put game_overlay com.dts.freefiremax mode=2,downscaleFactor=1.8
-    cmd package compile -m speed --secondary-dex com.dts.freefiremax
-    cmd appops set com.dts.freefiremax RUN_IN_BACKGROUND
-  fi
+    pkg="$selected_game"
 
-  setprop debug.hwui.renderer skiagl
-  setprop debug.renderengine.backend skiagl
-  dumpsys deviceidle force-idle
-  cmd looper_stats disable
+    cmd game downscale 1.8 "$pkg"
+    cmd device_config put game_overlay "$pkg" mode=2,downscaleFactor=1.8
+    cmd package compile -m speed --secondary-dex "$pkg"
+    cmd appops set "$pkg" RUN_IN_BACKGROUND
+
+    setprop debug.hwui.renderer skiagl
+    setprop debug.renderengine.backend skiagl
+    dumpsys deviceidle force-idle
+    cmd looper_stats disable
 }
 
+# ================= SYSTEM TWEAKS ================= #
 system_tweaks() {
-  dumpsys deviceidle whitelist +com.dts.freefireth > /dev/null 2>&1
-  dumpsys deviceidle whitelist +com.dts.freefiremax > /dev/null 2>&1
+    dumpsys deviceidle whitelist +"$selected_game" > /dev/null 2>&1
 
-  setprop false debug.egl.force_msaa > /dev/null 2>&1
-  setprop false debug.egl.force_fxaa > /dev/null 2>&1
-  setprop false debug.egl.force_taa > /dev/null 2>&1
-  setprop false debug.egl.force_smaa > /dev/null 2>&1
+    setprop false debug.egl.force_msaa
+    setprop false debug.egl.force_fxaa
+    setprop false debug.egl.force_taa
+    setprop false debug.egl.force_smaa
 
-  setprop 3000 debug.slow_query_threshold > /dev/null 2>&1
-  setprop true debug.hwui.skip_empty_damage > /dev/null 2>&1
-  setprop true debug.hwui.capture_skp_enabled > /dev/null 2>&1
-  setprop 2 debug.hwui.capture_skp_frames > /dev/null 2>&1
+    setprop true debug.hwui.skip_empty_damage
+    setprop true debug.hwui.capture_skp_enabled
+    setprop 2 debug.hwui.capture_skp_frames
 
-  cmd device_config put touchscreen input_drag_min_switch_speed 450 > /dev/null 2>&1
-  setprop debug.tracing.block_touch_buffer 1
-  settings put secure touch_blocking_period 0
+    cmd device_config put touchscreen input_drag_min_switch_speed 450
+    settings put secure touch_blocking_period 0
+    settings put system glove_mode 1
+    settings put global window_animation_scale 0.5
+    settings put global transition_animation_scale 0.5
+    settings put global animator_duration_scale 0.5
+
+    settings put system pointer_speed 5
+    settings put system pointer_acceleration 1
+
+    # Sensitivity
+    settings put system touchscreen_sensitivity_mode 3
+    settings put system touchscreen_threshold 9
+    settings put system touchscreen_sensitivity 10
+    settings put system touchscreen_min_press_time 50
+}
+
+# ================= FPS CALIBRATION ================= #
+fps_calibration() {
+    fps="$(dumpsys display | grep -Eo 'fps=[0-9]+' | cut -d= -f2 | sort -n | tail -n1)"
+    [ -z "$fps" ] && fps=60
+
+    cmd game set --fps "$fps" "$selected_game"
+    cmd device_config put game_overlay "$selected_game" fps="$fps"
+
+    frame_ns=$((1000000000 / fps))
+    phase_offset=$((frame_ns / 4))
+
+    setprop debug.sf.high_fps_early_gl_phase_offset_ns "$phase_offset"
+    setprop debug.sf.high_fps_early_phase_offset_ns "$phase_offset"
+    setprop debug.sf.high_fps_late_app_phase_offset_ns "$phase_offset"
+    setprop debug.sf.high_fps_late_sf_phase_offset_ns "$phase_offset"
+}
+
+# ================= TOUCH EXEC ================= #
+external_exe() {
+    input swipe $((RANDOM%1000)) $((RANDOM%1000)) \
+                $((RANDOM%1000)) $((RANDOM%1000)) \
+                $((RANDOM%1000+500)) -1
+}
+
+# ================= SENSI CALIB ================= #
+sensi_calibrar() {
+    size="$(wm size | grep -o '[0-9]*x[0-9]*')"
+    w="${size%x*}"
+    h="${size#*x}"
+
+    x=$((w / 2))
+    y1=100
+    y2=$((h - 100))
+    d=$((RANDOM%1000+500))
+
+    input swipe "$x" $((h/2)) "$x" "$y1" "$d" -1
+    input swipe "$x" "$y1" "$x" "$y2" "$d" -1
+}
+
+# ================= MAIN ================= #
+main() {
+    detect_game
+    run_game_setup
+    system_tweaks
+    fps_calibration
+    external_exe
+    sensi_calibrar
+    exechz
+}
+
+main > /dev/null 2>&1  settings put secure touch_blocking_period 0
   settings put secure glove_mode 1
   settings put system glove_mode 1
   settings put system screen_glove_mode_enabled 1
