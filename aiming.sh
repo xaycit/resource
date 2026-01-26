@@ -1,3 +1,5 @@
+#!/bin/sh
+
 HZ_URL "https://raw.github.com/LanzXsettings/Macro-Modz/resource/HZConfig"
 
 TH "com.dts.freefireth"
