@@ -1,9 +1,9 @@
 #!/bin/sh
 
-TH "com.dts.freefireth"
-MAX "com.dts.freefiremax"
+TH="com.dts.freefireth"
+MAX="com.dts.freefiremax"
 
-ns "$(dumpsys SurfaceFlinger | awk '/VSYNC period:/ {print $7}')"
+ns="$(dumpsys SurfaceFlinger | awk '/VSYNC period:/ {print $7}')"
 [ -z "$ns" ] && ns 16666666
 
 render() {
