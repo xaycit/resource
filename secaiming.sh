@@ -1,7 +1,7 @@
 #!/bin/sh
 
-TH "com.dts.freefireth"
-MAX "com.dts.freefiremax"
+TH="com.dts.freefireth"
+MAX="com.dts.freefiremax"
 
 run_game_setup() {
     cmd game downscale 2.5 "$TH"
