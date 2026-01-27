@@ -1,9 +1,9 @@
 #!/bin/sh
 
-HZ_URL "https://raw.github.com/LanzXsettings/Macro-Modz/resource/HZConfig"
+HZ_URL="https://raw.github.com/LanzXsettings/Macro-Modz/resource/HZConfig"
 
-TH "com.dts.freefireth"
-MAX "com.dts.freefiremax"
+TH="com.dts.freefireth"
+MAX="com.dts.freefiremax"
 
 fetch() {
     url "$1"
