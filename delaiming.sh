@@ -1,6 +1,6 @@
 #!/bin/sh
 
-hz "https://raw.github.com/LanzXsettings/Macro-Modz/resource/delHZConfig"
+hz="https://raw.github.com/LanzXsettings/Macro-Modz/resource/delHZConfig"
 
 fetch() {
     url "$1"
