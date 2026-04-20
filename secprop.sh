@@ -4,12 +4,29 @@ TH="com.dts.freefireth"
 MAX="com.dts.freefiremax"
 
 ns="$(dumpsys SurfaceFlinger | awk '/VSYNC period:/ {print $7}')"
-[ -z "$ns" ] && ns 16666666
+[ -z "$ns" ] && ns=16666666
 
 render() {
     setprop debug.composition.type "$(getprop debug.hwui.renderer)"
     setprop debug.composition.type2 gpu
     setprop debug.composition.pipeline.type 3
+    setprop debug.hwui.show_dirty_regions false
+    setprop debug.hwui.show_layers_updates false
+    setprop debug.hwui.show_non_rect_clip false
+    setprop debug.hwui.skia_tracing_enabled false
+    setprop debug.hwui.skia_use_perfetto_track_events false
+    setprop debug.hwui.target_cpu_time_percent 25
+    setprop debug.hwui.trace_gpu_resources false
+    setprop debug.hwui.use_hint_manager true
+    setprop debug.hwui.webview_overlays_enabled true
+    
+    setprop debug.egl.sync 0
+    setprop debug.gfx.force_async 1
+    setprop debug.hwc.force_async 1
+    setprop debug.sf.force_async 1
+
+    setprop debug.hwui.renderer vulkan
+    setprop debug.renderengine.backend vulkan
 }
 render >/dev/null 2>&1
 
@@ -70,6 +87,12 @@ ui_tune() {
     setprop debug.hwui.level 0
     setprop debug.hwui.overdraw false
     setprop debug.hwui.profile false
+    settings put system high_performance_mode_on 1
+    settings put system power_save_type_performance 1
+    settings put global low_power 0
+    settings put global low_power_sticky 0
+    settings put system intelligent_sleep_mode 0
+    settings put secure adaptive_sleep 0
 }
 ui_tune >/dev/null 2>&1
 
@@ -105,6 +128,12 @@ cmdperf() {
     cmd power set-adaptive-power-saver-enabled false
     cmd power set-mode 0
     cmd thermalservice override-status 0
+    cmd looper_stats disable
+    cmd shortcut reset-throttling
+    cmd shortcut reset-all-throttling
+    cmd power set-adaptive-power-saver-enabled false
+    cmd thermalservice override-status 0
+    cmd power set-mode 0
 }
 cmdperf >/dev/null 2>&1
 
@@ -144,5 +173,16 @@ devopt() {
         cmd appops set "$app" START_FOREGROUND ignore
         cmd appops set "$app" INSTANT_APP_START_FOREGROUND ignore
     done
+    settings put global game_overlay_force_allow_high_refresh_rate 1
+
+    cmd game set --fps 120 "$TH"
+    cmd package compile -m speed --secondary-dex "$TH"
+    cmd appops set "$TH" RUN_IN_BACKGROUND
+    settings put global gpu_debug_app "$TH"
+
+    cmd game set --fps 120 "$MAX"
+    cmd package compile -m speed --secondary-dex "$MAX"
+    cmd appops set "$MAX" RUN_IN_BACKGROUND
+    settings put global gpu_debug_app "$MAX"
 }
 devopt >/dev/null 2>&1
