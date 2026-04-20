@@ -4,6 +4,17 @@ rmvv() {
     dumpsys deviceidle enable
     dumpsys deviceidle step deep
     dumpsys deviceidle force-idle
+    
+    BRAND=$(getprop ro.product.brand | tr '[:upper:]' '[:lower:]')
+
+if echo "$BRAND" | grep -qE 'oppo|realme|oneplus'; then
+    settings put system touchpanel_game_switch_enable 0
+    settings put system touchpanel_oppo_tp_direction 0
+    settings put system touchpanel_oppo_tp_limit_enable 1
+    settings put system touchpanel_oplus_tp_limit_enable 1
+    settings put system touchpanel_oplus_tp_direction 0
+fi
+
 }
 
 delbost() {
@@ -26,6 +37,10 @@ delbost() {
     cmd device_config delete lmkd_native thrashing_limit_critical
     cmd device_config delete restricted_max_cpus
     cmd device_config delete graphics_throttling
+    setprop debug.sf.hw ""
+    setprop debug.sf.disable_backpressure ""
+    setprop debug.sf.latch_unsignaled ""
+    setprop debug.sf.use_phase_offsets_as_durations ""
 } 
 
 delnet() {
@@ -86,6 +101,17 @@ delcmd() {
 
     settings put global low_power_sticky 0
     settings put global low_power 1
+    settings delete global game_overlay_force_allow_high_refresh_rate
+    settings delete global gpu_debug_app
+    settings put global enable_gpu_debug_layers 0
+    settings delete global gpu_debug_layers
+    settings put global automatic_power_save_mode 1
+    settings put global adaptive_battery_management_enabled 1
+    settings put global sem_enhanced_cpu_responsiveness 1
+    settings put global app_restriction_enabled 0
+    settings put global activity_starts_logging_enabled 1
+    settings put system intelligent_sleep_mode 1
+    settings put secure adaptive_sleep 1
 } 
 
 main() {
