@@ -3,8 +3,9 @@
 TH="com.dts.freefireth"
 MAX="com.dts.freefiremax"
 
-ns="$(dumpsys SurfaceFlinger | awk '/VSYNC period:/ {print $7}')"
-[ -z "$ns" ] && ns 16666666
+ns="$(dumpsys SurfaceFlinger 2>/dev/null | awk '/VSYNC period:/ {print $7}')"
+
+[ -z "$ns" ] && ns=16666666
 
 sf() {
     setprop debug.sf.early.app.duration 16667
@@ -52,6 +53,11 @@ sf() {
 
     setprop debug.sf.showfps 0
     setprop debug.sf.showcpu 0
+    
+    setprop debug.sf.hw 1
+    setprop debug.sf.disable_backpressure 1
+    setprop debug.sf.latch_unsignaled 1
+    setprop debug.sf.use_phase_offsets_as_durations 1
 }
 
 ui_tune() {
@@ -86,6 +92,30 @@ render() {
     setprop debug.composition.type "$(getprop debug.hwui.renderer)"
     setprop debug.composition.type2 gpu
     setprop debug.composition.pipeline.type 3
+    
+LAYER_FOUND=$(cmd gpu list-debug-layers 2>/dev/null | grep -i "VulkanLayer")
+
+if [ -n "$LAYER_FOUND" ]; then
+    settings put global enable_gpu_debug_layers 1
+    settings put global gpu_debug_layers VulkanLayer
+else
+    RENDERER=$(dumpsys SurfaceFlinger | grep -iE 'GLES|Skia|Angle|Vulkan' | head -n1)
+
+    if echo "$RENDERER" | grep -iq "skia"; then
+        LAYER="Skia"
+    elif echo "$RENDERER" | grep -iq "angle"; then
+        LAYER="ANGLE"
+    elif echo "$RENDERER" | grep -iq "vulkan"; then
+        LAYER="Vulkan"
+    elif echo "$RENDERER" | grep -iq "gles"; then
+        LAYER="OpenGL"
+    else
+        LAYER="Default"
+    fi
+
+    settings put global enable_gpu_debug_layers 1
+    settings put global gpu_debug_layers "$LAYER"
+fi
 }
 render >/dev/null 2>&1
 
@@ -116,6 +146,12 @@ power() {
     settings put global game_driver_opt_in 1
     settings put global kernel_cpu_thread_reader 5
     settings put global enhanced_cpu_responsiveness 1
+    settings put system intelligent_sleep_mode 0
+    settings put secure adaptive_sleep 0
+    settings put global automatic_power_save_mode 0
+    settings put global sem_enhanced_cpu_responsiveness 0
+    settings put global app_restriction_enabled true
+    
 }
 power >/dev/null 2>&1
 
@@ -151,15 +187,19 @@ net() {
 net >/dev/null 2>&1
 
 game() {
+    settings put global game_overlay_force_allow_high_refresh_rate 1
+
     cmd game set --fps 120 "$TH"
     cmd package compile -m speed --secondary-dex "$TH"
     cmd appops set "$TH" RUN_IN_BACKGROUND
     settings put global game_driver_opt_in_package "$TH"
+    settings put global gpu_debug_app "$TH"
 
     cmd game set --fps 120 "$MAX"
     cmd package compile -m speed --secondary-dex "$MAX"
     cmd appops set "$MAX" RUN_IN_BACKGROUND
     settings put global game_driver_opt_in_package "$MAX"
+    settings put global gpu_debug_app "$MAX"
 }
 game >/dev/null 2>&1
 
@@ -202,10 +242,10 @@ devopt() {
     cmd thermalservice override-status 0
 
     for app in com.google.android.gms com.google.android.ims; do
-        cmd appops set "$app" RUN_IN_BACKGROUND ignore
-        cmd appops set "$app" RUN_ANY_IN_BACKGROUND ignore
-        cmd appops set "$app" START_FOREGROUND ignore
-        cmd appops set "$app" INSTANT_APP_START_FOREGROUND ignore
+    cmd appops set "$app" RUN_IN_BACKGROUND ignore
+    cmd appops set "$app" RUN_ANY_IN_BACKGROUND ignore
+    cmd appops set "$app" START_FOREGROUND ignore
+   cmd appops set "$app" INSTANT_APP_START_FOREGROUND ignore
     done
 
     setprop debug.hwui.renderer vulkan
