@@ -11,6 +11,19 @@ run_game_setup() {
     cmd device_config put game_overlay "$MAX" mode=2,downscaleFactor=2.5
 
     setprop debug.hwui.renderer skiagl
+    cmd package compile -m speed --secondary-dex com.dts.freefireth
+    cmd appops set com.dts.freefireth RUN_IN_BACKGROUND
+
+    cmd package compile -m speed --secondary-dex com.dts.freefiremax
+    cmd appops set com.dts.freefiremax RUN_IN_BACKGROUND
+    
+    rm -rf /storage/emulated/0/Android/data/com.dts.freefireth/cache/* 2>/dev/null
+    rm -rf /storage/emulated/0/Android/data/com.dts.freefiremax/cache/* 2>/dev/null
+    
+    dumpsys deviceidle whitelist +com.dts.freefireth
+    dumpsys deviceidle whitelist +com.dts.freefiremax
+    dumpsys deviceidle force-idle
+    cmd looper_stats disable
 }
 
 system_tweaks() {
@@ -27,6 +40,14 @@ system_tweaks() {
     cmd device_config put touchscreen input_drag_min_switch_speed 380
     settings put system pointer_speed 2
     settings put system pointer_acceleration 1
+    cmd device_config put input_native_boot palm_rejection_enabled 0
+
+    settings put system minimum_pointer_speed 1
+    settings put system maximum_pointer_speed 7
+
+    settings put system touchscreen_min_press_time 50
+    settings put system touch_sensitivity 5
+    settings put secure touch_block_delay 0
 
     settings put global window_animation_scale 0.5
     settings put global transition_animation_scale 0.5
@@ -43,11 +64,24 @@ system_tweaks() {
     settings put system touch.pressure.scale 0.001
     settings put secure tap_duration_threshold 0.0
     settings put system touch.scroll.calibration physical
+    
+    android_version=$(getprop ro.build.version.release | grep -o '[0-9]\+' | head -n1)
+game_pkgs="com.dts.freefireth,com.dts.freefiremax"
+
+if [ "$android_version" -lt 12 ]; then
+    settings put global game_driver_all_apps 1
+    settings put global game_driver_opt_out_apps ""
+    settings put global game_driver_opt_in_apps "$game_pkgs"
+else
+    settings put global updatable_driver_all_apps 1
+    settings put global updatable_driver_production_opt_out_apps ""
+    settings put global updatable_driver_production_opt_in_apps "$game_pkgs"
+fi
 }
 
 fps_calibration() {
-    fps "$(dumpsys display | grep -Eo 'fps=[0-9]+' | cut -d= -f2 | sort -n | tail -n1)"
-    [ -z "$fps" ] && fps 60
+    fps="$(dumpsys display | grep -Eo 'fps=[0-9]+' | cut -d= -f2 | sort -n | tail -n1)"
+    [ -z "$fps" ] && fps=60
 
     cmd game set --fps "$fps" "$TH"
     cmd device_config put game_overlay "$TH" fps="$fps"
@@ -55,8 +89,8 @@ fps_calibration() {
     cmd game set --fps "$fps" "$MAX"
     cmd device_config put game_overlay "$MAX" fps="$fps"
 
-    frame_ns $((1000000000 / fps))
-    phase_ns $((frame_ns / 4))
+    frame_ns=$((1000000000 / fps))
+    phase_ns=$((frame_ns / 4))
 
     setprop debug.sf.high_fps_early_gl_phase_offset_ns "$phase_ns"
     setprop debug.sf.high_fps_early_phase_offset_ns "$phase_ns"
