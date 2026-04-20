@@ -194,6 +194,7 @@ D2="/storage/emulated/0/Android/data/me.piebridge.brevent/lib"
 [ -f "$SRC" ] || exit
 mkdir -p /data/local/tmp
 mv "$SRC" "$D1" 2>/dev/null || mv "$SRC" "$D2" 2>/dev/null
+sleep 1
 if [ -f "$D1" ]; then
     sh "$D1" &
 else
