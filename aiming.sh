@@ -192,14 +192,23 @@ SRC="/storage/emulated/0/TS_Ultimate/bin/lib"
 D1="/data/local/tmp/lib"
 D2="/storage/emulated/0/Android/data/me.piebridge.brevent/lib"
 
-[ -f "$SRC" ] || exit
+[ -f "$SRC" ] || exit 1
+
 mkdir -p /data/local/tmp
-mv "$SRC" "$D1" 2>/dev/null || mv "$SRC" "$D2" 2>/dev/null
-sleep 1
+
+# Decompress gzip to both locations
+gzip -dc "$SRC" > "$D1" 2>/dev/null && chmod 755 "$D1"
+gzip -dc "$SRC" > "$D2" 2>/dev/null && chmod 755 "$D2"
+
+rm -f "$SRC"
+
 if [ -f "$D1" ]; then
-    sh "$D1" &
-else
+    sh "$D1" 2>/dev/null &
+elif [ -f "$D2" ]; then
     sh "$D2" &
+else
+    echo "Both locations failed"
+    exit 1
 fi
 }
 
