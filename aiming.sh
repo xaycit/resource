@@ -17,17 +17,18 @@ fetch() {
 }
 
 fix_downscale() {
-    local pkg="$1"
-    local target=1.8
+local pkg="$1"
+local target=1.8
 
-    local current
-    current=$(cmd device_config get game_overlay "$pkg" 2>/dev/null | sed -n 's/.*downscaleFactor=\([0-9.]*\).*/\1/p')
+local current
+current=$(cmd device_config get game_overlay "$pkg" 2>/dev/null \
+    | sed -n 's/.*downscaleFactor=\([0-9.]*\).*/\1/p')
 
-    if [ "$current" = "2.0" ] || [ "$current" != "$target" ]; then
+if [ "$current" != "$target" ]; then
     cmd device_config delete game_overlay "$pkg" >/dev/null 2>&1
     sleep 0.5
     cmd device_config put game_overlay "$pkg" "mode=2,downscaleFactor=$target" >/dev/null 2>&1
-    fi
+fi
 }
 
 exechz() {
