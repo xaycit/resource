@@ -4,11 +4,8 @@ TH="com.dts.freefireth"
 MAX="com.dts.freefiremax"
 
 run_game_setup() {
-    cmd game downscale 2.5 "$TH"
-    cmd device_config put game_overlay "$TH" mode=2,downscaleFactor=2.5
-
-    cmd game downscale 2.5 "$MAX"
-    cmd device_config put game_overlay "$MAX" mode=2,downscaleFactor=2.5
+    cmd device_config put game_overlay "$TH" mode=2,downscaleFactor=1.5
+    cmd device_config put game_overlay "$MAX" mode=2,downscaleFactor=1.5
 
     setprop debug.hwui.renderer skiagl
     cmd package compile -m speed --secondary-dex com.dts.freefireth
