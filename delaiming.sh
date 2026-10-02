@@ -75,8 +75,8 @@ main() {
     cmd compile -m everything --reset com.dts.freefireth
     cmd compile -m everything --reset com.dts.freefiremax
 
-    settings put secure touch_blocking_period 500
-    settings put secure touch_block_delay 100 
+    settings put secure touch_blocking_period 0
+    settings put secure touch_block_delay 0 
     settings put system touch_sensitivity 3 
 
     settings put system glove_mode 0
