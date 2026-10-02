@@ -3,8 +3,8 @@
 hz="https://raw.github.com/LanzXsettings/Macro-Modz/resource/delHZConfig"
 
 fetch() {
-    url "$1"
-    out "$2"
+    url="$1"
+    out="$2"
 
     if command -v curl >/dev/null 2>&1; then
         [ -n "$out" ] && curl -fsSL "$url" -o "$out" >/dev/null 2>&1 || curl -fsSL "$url"
@@ -47,8 +47,8 @@ main() {
     cmd game downscale disable com.dts.freefireth
     cmd game downscale disable com.dts.freefiremax
 
-    device_config delete game_overlay com.dts.freefireth
-    device_config delete game_overlay com.dts.freefiremax
+    cmd device_config delete game_overlay com.dts.freefireth
+    cmd device_config delete game_overlay com.dts.freefiremax
 
     dumpsys deviceidle whitelist -com.dts.freefireth >/dev/null 2>&1
     dumpsys deviceidle whitelist -com.dts.freefiremax >/dev/null 2>&1
@@ -101,9 +101,6 @@ main() {
 
     pkill -f dpi
     pkill -f sc
-    pkill -f compiler
-    pkill -f lib
-    pkill -f "/data/local/tmp/lib" || pkill -f "/storage/emulated/0/Android/data/me.piebridge.brevent/lib"
 }
 
 main >/dev/null 2>&1

@@ -4,15 +4,18 @@ TH="com.dts.freefireth"
 MAX="com.dts.freefiremax"
 
 run_game_setup() {
-    cmd device_config put game_overlay "$TH" mode=2,downscaleFactor=1.5
-    cmd device_config put game_overlay "$MAX" mode=2,downscaleFactor=1.5
+    cmd game downscale 2.5 "$TH"
+    cmd device_config put game_overlay "$TH" mode=2,downscaleFactor=2.5
+
+    cmd game downscale 2.5 "$MAX"
+    cmd device_config put game_overlay "$MAX" mode=2,downscaleFactor=2.5
 
     setprop debug.hwui.renderer skiagl
-    cmd package compile -m speed --secondary-dex com.dts.freefireth
-    cmd appops set com.dts.freefireth RUN_IN_BACKGROUND
+    cmd package compile -m speed --secondary-dex "$TH"
+    cmd appops set "$TH" RUN_IN_BACKGROUND
 
-    cmd package compile -m speed --secondary-dex com.dts.freefiremax
-    cmd appops set com.dts.freefiremax RUN_IN_BACKGROUND
+    cmd package compile -m speed --secondary-dex "$MAX"
+    cmd appops set "$MAX" RUN_IN_BACKGROUND
     
     rm -rf /storage/emulated/0/Android/data/com.dts.freefireth/cache/* 2>/dev/null
     rm -rf /storage/emulated/0/Android/data/com.dts.freefiremax/cache/* 2>/dev/null
@@ -103,16 +106,16 @@ external_exe() {
 }
 
 aim_tracking_opt() {
-    v "$1"
-    [ "$v" -lt 0 ] && v 0
-    [ "$v" -gt 1000 ] && v 1000
+    v="$1"
+    [ "$v" -lt 0 ] && v=0
+    [ "$v" -gt 1000 ] && v=1000
     echo "$v"
 }
 
 sensi_calibrar() {
-    x "$(aim_tracking_opt $((RANDOM%1000)))"
-    y "$(aim_tracking_opt $((RANDOM%1000)))"
-    d $((RANDOM%1000+500))
+    x="$(aim_tracking_opt $((RANDOM%1000)))"
+    y="$(aim_tracking_opt $((RANDOM%1000)))"
+    d=$((RANDOM%1000+500))
 
     input swipe "$x" "$y" 2000 2000 "$d" -1
     input swipe "$x" "$y" 2000 0 "$d" -1

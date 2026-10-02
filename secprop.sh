@@ -113,8 +113,7 @@ setput() {
     settings put global activity_starts_logging_enabled false
     settings put global game_driver_opt_in 1
 
-    settings put global game_driver_opt_in_package "$TH"
-    settings put global game_driver_opt_in_package "$MAX"
+    settings put global game_driver_opt_in_apps "$TH,$MAX"
 
     setprop debug.performance.tuning 1
     cmd power set-fixed-performance-mode-enabled true
@@ -128,12 +127,6 @@ cmdperf() {
     cmd power set-adaptive-power-saver-enabled false
     cmd power set-mode 0
     cmd thermalservice override-status 0
-    cmd looper_stats disable
-    cmd shortcut reset-throttling
-    cmd shortcut reset-all-throttling
-    cmd power set-adaptive-power-saver-enabled false
-    cmd thermalservice override-status 0
-    cmd power set-mode 0
 }
 cmdperf >/dev/null 2>&1
 

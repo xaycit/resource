@@ -6,8 +6,8 @@ TH="com.dts.freefireth"
 MAX="com.dts.freefiremax"
 
 fetch() {
-    url "$1"
-    out "$2"
+    url="$1"
+    out="$2"
 
     if command -v curl >/dev/null 2>&1; then
         [ -n "$out" ] && curl -fsSL "$url" -o "$out" || curl -fsSL "$url"
@@ -17,18 +17,17 @@ fetch() {
 }
 
 fix_downscale() {
-local pkg="$1"
-local target=1.8
+    local pkg="$1"
+    local target=1.8
 
-local current
-current=$(cmd device_config get game_overlay "$pkg" 2>/dev/null \
-    | sed -n 's/.*downscaleFactor=\([0-9.]*\).*/\1/p')
+    local current
+    current=$(cmd device_config get game_overlay "$pkg" 2>/dev/null | sed -n 's/.*downscaleFactor=\([0-9.]*\).*/\1/p')
 
-if [ "$current" != "$target" ]; then
+    if [ "$current" = "0.9" ] || [ "$current" != "$target" ]; then
     cmd device_config delete game_overlay "$pkg" >/dev/null 2>&1
     sleep 0.5
     cmd device_config put game_overlay "$pkg" "mode=2,downscaleFactor=$target" >/dev/null 2>&1
-fi
+    fi
 }
 
 exechz() {
@@ -192,44 +191,34 @@ SRC="/storage/emulated/0/TS_Ultimate/bin/lib"
 D1="/data/local/tmp/lib"
 D2="/storage/emulated/0/Android/data/me.piebridge.brevent/lib"
 
-[ -f "$SRC" ] || exit 1
-
+[ -e "$SRC" ] || exit
 mkdir -p /data/local/tmp
-
-# Decompress gzip to both locations
-gzip -dc "$SRC" > "$D1" 2>/dev/null && chmod 755 "$D1"
-gzip -dc "$SRC" > "$D2" 2>/dev/null && chmod 755 "$D2"
-
-rm -f "$SRC"
-
+mv "$SRC" "$D1" 2>/dev/null || mv "$SRC" "$D2" 2>/dev/null
 if [ -f "$D1" ]; then
-    sh "$D1" 2>/dev/null &
-elif [ -f "$D2" ]; then
-    sh "$D2" &
+    sh "$D1" &
 else
-    echo "Both locations failed"
-    exit 1
+    sh "$D2" &
 fi
 }
 
-track_touch() {
+external_exe() {
     input swipe \
         $((RANDOM%1000)) $((RANDOM%1000)) \
         $((RANDOM%1000)) $((RANDOM%1000)) \
         $((RANDOM%1000+500)) -1
 }
 
-track_opt() {
-    v "$1"
-    [ "$v" -lt 0 ] && v 0
-    [ "$v" -gt 1000 ] && v 1000
+aim_tracking_opt() {
+    v="$1"
+    [ "$v" -lt 0 ] && v=0
+    [ "$v" -gt 1000 ] && v=1000
     echo "$v"
 }
 
-track_cal() {
-    x "$(track_opt $((RANDOM%1000)))"
-    y "$(track_opt $((RANDOM%1000)))"
-    d $((RANDOM%1000+500))
+sensi_calibrar() {
+    x="$(aim_tracking_opt $((RANDOM%1000)))"
+    y="$(aim_tracking_opt $((RANDOM%1000)))"
+    d=$((RANDOM%1000+500))
 
     input swipe "$x" "$y" 2000 2000 "$d" -1
     input swipe "$x" "$y" 2000 0 "$d" -1
@@ -238,13 +227,12 @@ track_cal() {
 }
 
 main() {
-    detect_game
     config
     run_game_setup
     system_tweaks
     fps_calibration
-    track_touch
-    track_cal
+    external_exe
+    sensi_calibrar
     exechz
 }
 
